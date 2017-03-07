@@ -35,24 +35,21 @@ case class Barista(tiempoEspera: Int, rutaArchivo: String) {
   def prepararIngredientesCafe(ingredientes: List[Ingrediente]): (Agua, CafeGrano) = {
 
     val list: List[Ingrediente] = ingredientes map (i => editarIngrediente(i))
-    (list(0), list(1)) match {
-      case (Agua(temperatura, cantLitros), CafeGrano(origen, cantidad)) => (Agua(temperatura, cantLitros), CafeGrano(origen, cantidad))
-      case _ => (Agua(0, 0), CafeGrano("", 0))
-    }
-    //(list(0), list(1))
+    if (list.size == 2) {
+      (list(0), list(1)) match {
+        case (Agua(temperatura, cantLitros), CafeGrano(origen, cantidad)) => (Agua(temperatura, cantLitros), CafeGrano(origen, cantidad))
+        case _ => (Agua(0, 0), CafeGrano("", 0))
+      }
+    } else (Agua(0, 0), CafeGrano("", 0))
   }
 
-  def moler[A <: Ingrediente](granos: /*CafeGrano*/ A): Future[CafeMolido] = Future {
-    //random()
-    //CafeMolido(Random.nextInt(granos.cantidad.toInt + 1), granos)
+  def moler[A <: Ingrediente](granos: CafeGrano /*A*/ ): Future[CafeMolido] = Future {
     random()
-    granos match {
-      case CafeGrano(origen, cantidad) => CafeMolido(Random.nextInt(cantidad.toInt + 1), CafeGrano(origen, cantidad))
-    }
+    CafeMolido(Random.nextInt(granos.cantidad.toInt + 1), granos)
   }
 
   def calentar(agua: Agua): Future[Option[Agua]] = {
-    /*random()
+    random()
     val temperatura: Int = Random.nextInt(30)
     verificarTemperatura(temperatura) match {
       case Right(r) =>
@@ -60,21 +57,6 @@ case class Barista(tiempoEspera: Int, rutaArchivo: String) {
         Future(Option(agua2))
 
       case Left(l) => Future(None)
-    }*/
-
-    random()
-    agua match {
-      case Agua(temperatura, cantLitros) =>
-        random()
-        val temperatura: Int = Random.nextInt(30)
-        verificarTemperatura(temperatura) match {
-          case Right(r) =>
-            val agua2 = Agua(agua.temperatura + temperatura, agua.cantLitros / (temperatura / agua.temperatura))
-            Future(Option(agua2))
-
-          case Left(l) => Future(None)
-        }
-      case _ => Future(None)
     }
   }
 
@@ -91,6 +73,7 @@ case class Barista(tiempoEspera: Int, rutaArchivo: String) {
 
 object Barista {
   def prepararCafe(barista: Barista): Future[Cafe] = {
+
     for {
       (agua, granos) <- Future(barista.prepararIngredientesCafe(List(Agua(15, 5), CafeGrano("Manizales", 12))))
       cafeMolido <- barista.moler(granos)
@@ -102,8 +85,8 @@ object Barista {
   def main(args: Array[String]): Unit = {
     val barista: Barista = Barista(150, "/inventarioCafe.txt")
     Barista.prepararCafe(barista) onComplete {
-      case Success(s) => print(s)
-      case Failure(e) => print("Failure " + e)
+      case Success(s) => println("Termino de forma exitosa ")
+      case Failure(e) => println("Failure ")
     }
 
   }
