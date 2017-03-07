@@ -4,8 +4,6 @@ import java.io.{ BufferedWriter, File, FileWriter, InputStream }
 
 import co.s4n.capacitaciones.sesion2.ErrorHandling.{ CafeGrano, Ingrediente }
 
-import scala.io.Source
-
 /**
  * Created by daniel on 6/03/17.
  */
@@ -41,12 +39,10 @@ case class LeerArchivoCafe() {
 
   def escribirArchivo(texto: List[String]): Unit = {
 
-    println("escribiendo...")
     val file = new File(archivo)
     val bw = new BufferedWriter(new FileWriter("./src/main/resources/inventarioCafe2.txt"))
     texto.foreach(x => bw.write(x + "\n"))
     bw.close()
-    println("termino de escribir")
   }
 
 }
