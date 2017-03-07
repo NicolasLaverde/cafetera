@@ -1,4 +1,7 @@
-def divideXByY(y: Int): Either[String, Int] = {
-  if (y == 0) Left("Dude, can't divide by 0")
-  else Right(1 / y)
-}
+import java.io.InputStream
+
+import scala.io.Source
+
+  //val lines = scala.io.Source.fromInputStream( stream ).getLines.toList
+  //val ingredientesOrdenados = lines.map(x => x.split(",").toVector)
+
