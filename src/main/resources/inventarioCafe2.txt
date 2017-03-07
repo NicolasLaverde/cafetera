@@ -1,3 +1,3 @@
 origen,cantidadGramos
-Manizales,20
 Medellin,50
+Manizales,8.0
