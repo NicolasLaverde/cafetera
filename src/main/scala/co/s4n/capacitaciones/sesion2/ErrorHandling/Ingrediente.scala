@@ -1,6 +1,7 @@
 package co.s4n.capacitaciones.sesion2.ErrorHandling
 
 sealed trait Ingrediente
+
 case class Agua(temperatura: Int, cantLitros: Double) extends Ingrediente {
   override def toString(): String = { temperatura + "," + cantLitros }
 }
@@ -15,8 +16,11 @@ case class CafeMolido(cantidad: Double, cafeGrano: CafeGrano) extends Ingredient
 
 //trait despacharIngredientes[A <: Ingrediente] {
 
-//  def editarIngrediente(ingrendiente: Ingrediente): A
-
+//  def editarIngrediente[A <: Ingrediente](ingrendiente: A): A =  {
+//    ingrendiente match {
+//      case Agua(_, _) => Agua(_, _)
+//    }
+//  }
 //}
 
 //object despacharIngrediente extends despacharIngredientes[Cafe] {
