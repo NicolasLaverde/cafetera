@@ -17,6 +17,7 @@ case class LeerArchivoCafe() {
   def editar[A <: Ingrediente](ingrediente: A): Ingrediente = {
     ingrediente match {
       case CafeGrano(_, _) => editarUnIngrediente(ingrediente)
+      case Agua(_, _) => editarUnIngrediente(ingrediente)
       case _ => ingrediente
     }
   }
@@ -94,6 +95,9 @@ case class LeerArchivoCafe() {
       case CafeGrano(_, _) =>
         escribir(titulo :: lista.map(x => x.toString) ++ List(ingrediente.toString), archivoEscritura(ingrediente))
         ingrediente
+      case Agua(_, _) =>
+        escribir(titulo :: lista.map(x => x.toString), archivoEscritura(ingrediente))
+        ingrediente
       case _ => ingrediente
     }
   }
@@ -118,6 +122,7 @@ case class LeerArchivoCafe() {
     val bw = new BufferedWriter(new FileWriter(nombreArchivo))
     texto.foreach(x => bw.write(x + "\n"))
     bw.close()
+
     println("Escribio en el archivo")
   }
 }

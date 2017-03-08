@@ -18,19 +18,13 @@ case class Barista(tiempoEspera: Int) {
         LeerArchivoCafe().editar(CafeGrano(origen, cantidad))
 
       case Agua(temperatura, cantLitros) =>
-        //LeerArchivoAgua().editarIngrediente(Agua(temperatura, cantLitros))
-        //Agua(temperatura, cantLitros)
+
         LeerArchivoCafe().editar(Agua(temperatura, cantLitros))
 
       case Leche(temperatura, cantLitros, tipoLeche) => Leche(temperatura, cantLitros, tipoLeche)
 
       case CafeMolido(cantidad, cafeGrano) => CafeMolido(cantidad, cafeGrano)
     }
-
-  /*  def prepararIngredientes[A <: Ingrediente](ingredientes: List[Ingrediente]): List[ /*A*/ Ingrediente] = {
-
-    ingredientes map (i => editarIngrediente(i))
-  }*/
 
   def prepararIngredientesCafe(ingredientes: List[Ingrediente]): (Agua, CafeGrano) = {
 
@@ -56,7 +50,9 @@ case class Barista(tiempoEspera: Int) {
         val agua2 = Agua(agua.temperatura + temperatura, agua.cantLitros / (temperatura / agua.temperatura))
         Future(Option(agua2))
 
-      case Left(l) => calentar(agua)
+      case Left(l) =>
+        println("\n\nCalentar agua ha fallado\n\n")
+        calentar(agua)
     }
   }
 
@@ -83,6 +79,7 @@ object Barista {
   }
 
   def main(args: Array[String]): Unit = {
+    println("Empezando con el barista...")
     val barista: Barista = Barista(150)
     Barista.prepararCafe(barista) onComplete {
       case Success(s) => println("Termino de forma exitosa ")
