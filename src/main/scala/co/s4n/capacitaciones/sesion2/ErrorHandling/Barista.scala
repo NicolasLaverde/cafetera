@@ -19,7 +19,8 @@ case class Barista(tiempoEspera: Int) {
 
       case Agua(temperatura, cantLitros) =>
         //LeerArchivoAgua().editarIngrediente(Agua(temperatura, cantLitros))
-        Agua(temperatura, cantLitros)
+        //Agua(temperatura, cantLitros)
+        LeerArchivoCafe().editar(Agua(temperatura, cantLitros))
 
       case Leche(temperatura, cantLitros, tipoLeche) => Leche(temperatura, cantLitros, tipoLeche)
 

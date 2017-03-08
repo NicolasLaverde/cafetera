@@ -1,6 +1,6 @@
 package co.s4n.capacitaciones.sesion2.ErrorHandling.repository
 
-import java.io.{ BufferedWriter, File, FileWriter, InputStream }
+import java.io.{ BufferedWriter, FileWriter, InputStream }
 
 import co.s4n.capacitaciones.sesion2.ErrorHandling.{ Agua, CafeGrano, Ingrediente, Leche }
 
@@ -24,9 +24,11 @@ case class LeerArchivoCafe() {
   private def editarUnIngrediente[A <: Ingrediente](ingrediente: A)(): Ingrediente = {
     val (titulo: String, datos: List[Array[String]]) = leerArchivoIngredientes(archivoLectura(ingrediente))
     val ingredienteList: List[Ingrediente] = datos.map(x => crearIngrediente(ingrediente, x.head, x(1)))
-    val filtro: List[Ingrediente] = ingredienteList.filter(x => filtrar(ingrediente, x))
+    //val filtro: List[Ingrediente] = ingredienteList.filter(x => filtrar(ingrediente, x))
 
-    escribirArchivoIngrediente(titulo, seEdita(ingrediente, filtro.head), ingredienteList.filterNot(x => filtrar(ingrediente, x)))
+    val (filtro: List[Ingrediente], noFiltro: List[Ingrediente]) = filtrar2(ingrediente, ingredienteList)
+
+    escribirArchivoIngrediente(titulo, seEdita(ingrediente, filtro.head), noFiltro)
   }
 
   private def leerArchivoIngredientes(archivo: String): (String, List[Array[String]]) = {
@@ -44,11 +46,18 @@ case class LeerArchivoCafe() {
     }
   }
 
-  private def filtrar2[A <: Ingrediente](ingrediente: A, lista: List[A]): List[Ingrediente] = {
+  private def filtrar2[A <: Ingrediente](ingrediente: A, lista: List[A]): (List[Ingrediente], List[Ingrediente]) = {
     ingrediente match {
-      case CafeGrano(origen1, _) => lista.filter(x => filtrar(ingrediente, x))
-      //case Agua(_, _) => val suma = lista.foldLeft(0) (x => x.)
-      case _ => List()
+      case CafeGrano(_, _) => (lista.filter(x => filtrar(ingrediente, x)), lista.filterNot(x => filtrar(ingrediente, x)))
+      case Agua(temperatura, _) =>
+        def iterar(a: A): Double = {
+          a match {
+            case Agua(_, cantLitros) => cantLitros
+            case _ => 0d
+          }
+        }
+        (List(Agua(temperatura, lista.map(x => iterar(x)).sum)), List(Agua(temperatura, lista.map(x => iterar(x)).sum)))
+      case _ => (List(), List())
     }
   }
 
@@ -70,6 +79,12 @@ case class LeerArchivoCafe() {
           case CafeGrano(_, cantidad2) if cantidad2 - cantidad1 >= 0 => CafeGrano(origen1, cantidad2 - cantidad1)
           case _ => a
         }
+      case Agua(temperatura1, cantLitros1) => {
+        b match {
+          case Agua(_, cantLitros2) if cantLitros2 - cantLitros1 >= 0 => Agua(temperatura1, cantLitros2 - cantLitros1)
+          case _ => a
+        }
+      }
       case _ => a
     }
   }
