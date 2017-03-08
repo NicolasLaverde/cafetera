@@ -15,7 +15,7 @@ case class Barista(tiempoEspera: Int) {
     ing match {
 
       case CafeGrano(origen, cantidad) =>
-        LeerArchivoCafe().editarIngrediente(CafeGrano(origen, cantidad))
+        LeerArchivoCafe().editar(CafeGrano(origen, cantidad))
 
       case Agua(temperatura, cantLitros) =>
         //LeerArchivoAgua().editarIngrediente(Agua(temperatura, cantLitros))
