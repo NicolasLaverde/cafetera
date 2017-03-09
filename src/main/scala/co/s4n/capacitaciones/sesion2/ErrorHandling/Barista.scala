@@ -1,6 +1,6 @@
 package co.s4n.capacitaciones.sesion2.ErrorHandling
 
-import co.s4n.capacitaciones.sesion2.ErrorHandling.repository.{ LeerArchivoAgua, LeerArchivoCafe }
+import co.s4n.capacitaciones.sesion2.ErrorHandling.repository.GestorArchivo
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -15,11 +15,10 @@ case class Barista(tiempoEspera: Int) {
     ing match {
 
       case CafeGrano(origen, cantidad) =>
-        LeerArchivoCafe().editar(CafeGrano(origen, cantidad))
+        GestorArchivo().editar(CafeGrano(origen, cantidad))
 
       case Agua(temperatura, cantLitros) =>
-
-        LeerArchivoCafe().editar(Agua(temperatura, cantLitros))
+        GestorArchivo().editar(Agua(temperatura, cantLitros))
 
       case Leche(temperatura, cantLitros, tipoLeche) => Leche(temperatura, cantLitros, tipoLeche)
 
@@ -46,12 +45,12 @@ case class Barista(tiempoEspera: Int) {
     random()
     val temperatura: Int = Random.nextInt(30)
     verificarTemperatura(temperatura) match {
-      case Right(r) =>
+      case Right(_) =>
         val agua2 = Agua(agua.temperatura + temperatura, agua.cantLitros / (temperatura / agua.temperatura))
         Future(Option(agua2))
 
-      case Left(l) =>
-        println("\n\nCalentar agua ha fallado\n\n")
+      case Left(_) =>
+        println("\nCalentar agua ha fallado\n")
         calentar(agua)
     }
   }
@@ -82,8 +81,8 @@ object Barista {
     println("Empezando con el barista...")
     val barista: Barista = Barista(150)
     Barista.prepararCafe(barista) onComplete {
-      case Success(s) => println("Termino de forma exitosa ")
-      case Failure(e) => println("Termino con error....... ")
+      case Success(_) => println("Termino de forma exitosa ")
+      case Failure(_) => println("Termino con error....... ")
     }
 
   }
