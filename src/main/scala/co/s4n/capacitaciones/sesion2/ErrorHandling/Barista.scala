@@ -1,6 +1,5 @@
 package co.s4n.capacitaciones.sesion2.ErrorHandling
 
-import co.s4n.capacitaciones.sesion2.ErrorHandling.repository.GestorArchivo
 import co.s4n.capacitaciones.sesion2.ErrorHandling.service.{ AguaService, CafeGranoService }
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -45,9 +44,10 @@ case class Barista(tiempoEspera: Int) {
     random()
     val temperatura: Int = Random.nextInt(30)
     verificarTemperatura(temperatura) match {
-      case Right(_) =>
+      case Right(_) => Future {
         val agua2 = Agua(agua.temperatura + temperatura, agua.cantLitros / (temperatura / agua.temperatura))
-        Future(Option(agua2))
+        Option(agua2)
+      }
 
       case Left(_) =>
         println("\nCalentar agua ha fallado\n")

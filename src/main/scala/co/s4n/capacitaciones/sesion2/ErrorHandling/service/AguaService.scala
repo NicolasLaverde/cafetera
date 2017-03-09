@@ -6,7 +6,7 @@ import co.s4n.capacitaciones.sesion2.ErrorHandling.repository.GestorArchivo
 case class AguaService() extends IngredienteService[Agua] {
 
   private val archivoAgua: String = "/inventarioAgua.txt"
-  private val archivoSalidaAgua: String = "./src/main/resources/inventarioAgua2-.txt"
+  private val archivoSalidaAgua: String = "./src/main/resources/inventarioAgua2.txt"
 
   def editar(ingrediente: Agua): Agua = {
     editarUnIngrediente(ingrediente)
