@@ -1,6 +1,7 @@
 package co.s4n.capacitaciones.sesion2.ErrorHandling
 
 import co.s4n.capacitaciones.sesion2.ErrorHandling.repository.GestorArchivo
+import co.s4n.capacitaciones.sesion2.ErrorHandling.service.{ AguaService, CafeGranoService }
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -11,14 +12,13 @@ case class Barista(tiempoEspera: Int) {
   def random(): Unit = Thread.sleep(Random.nextInt(tiempoEspera))
 
   def editarIngrediente[A <: Ingrediente](ing: A): Ingrediente =
-
     ing match {
 
       case CafeGrano(origen, cantidad) =>
-        GestorArchivo().editar(CafeGrano(origen, cantidad))
+        CafeGranoService().editar(CafeGrano(origen, cantidad))
 
       case Agua(temperatura, cantLitros) =>
-        GestorArchivo().editar(Agua(temperatura, cantLitros))
+        AguaService().editar(Agua(temperatura, cantLitros))
 
       case Leche(temperatura, cantLitros, tipoLeche) => Leche(temperatura, cantLitros, tipoLeche)
 
@@ -36,7 +36,7 @@ case class Barista(tiempoEspera: Int) {
     } else (Agua(0, 0), CafeGrano("", 0))
   }
 
-  def moler[A <: Ingrediente](granos: CafeGrano /*A*/ ): Future[CafeMolido] = Future {
+  def moler(granos: CafeGrano): Future[CafeMolido] = Future {
     random()
     CafeMolido(Random.nextInt(granos.cantidad.toInt + 1), granos)
   }
