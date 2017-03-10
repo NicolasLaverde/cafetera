@@ -74,9 +74,9 @@ object Barista {
       aguaCaliente <- Future(barista.calentar(agua))
     } yield {
       for {
-        xxx <- cafeMolido
-        yyy <- aguaCaliente
-      } yield barista.preparar(xxx, yyy)
+        cafe <- cafeMolido
+        agua <- aguaCaliente
+      } yield barista.preparar(cafe, agua)
     }).flatMap {
       case Some(cafe) => Future.successful(cafe)
       case None => Future.failed(new Exception("Error"))
@@ -88,11 +88,6 @@ object Barista {
     val barista: Barista = Barista(150)
     val await = Await.result(Barista.prepararCafe(barista), Duration.Inf)
     println(await)
-    //    Barista.prepararCafe(barista) onComplete {
-    //      case Success(cafe) => println("Termino de forma exitosa ")
-    //      case Failure(error) => println("Termino con error....... ")
-    //    }
-
   }
 
 }
