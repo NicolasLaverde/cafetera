@@ -12,8 +12,10 @@ object Barista {
       (agua, granos) <- Future(barista.prepararIngredientes(List(Agua(15, 5), CafeGrano("Manizales", 12))))
       cafeMolido <- Future(barista.moler(granos))
       aguaCaliente <- Future(barista.calentar(agua))
-      cafe <- Future(barista.preparar(cafeMolido, aguaCaliente))
-    } yield cafe
+    } yield barista.preparar(cafeMolido, aguaCaliente)
+  }.flatMap {
+    case Some(cafe) => Future.successful(cafe)
+    case None => Future.failed(new Exception("Error haciendo café"))
   }
 
   def main(args: Array[String]): Unit = {
@@ -22,5 +24,5 @@ object Barista {
     val await = Await.result(Barista.prepararCafe(barista), Duration.Inf)
     println(await)
   }
-
 }
+

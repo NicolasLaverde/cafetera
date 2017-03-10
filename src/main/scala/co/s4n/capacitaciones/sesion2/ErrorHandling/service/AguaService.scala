@@ -7,7 +7,7 @@ import scala.util.{ Failure, Success }
 
 case class AguaService() extends IngredienteService[Agua] {
 
-  private val archivoAgua: String = "/inventarioAgua1.txt"
+  private val archivoAgua: String = "/inventarioAgua.txt"
   private val archivoSalidaAgua: String = "./src/main/resources/inventarioAgua2.txt"
 
   def editar(ingrediente: Agua): Option[Agua] = {

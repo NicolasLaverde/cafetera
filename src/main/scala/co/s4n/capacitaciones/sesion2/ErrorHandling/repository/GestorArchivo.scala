@@ -28,7 +28,7 @@ case class GestorArchivo() {
 
     Try {
       val bw = new BufferedWriter(new FileWriter(nombreArchivo))
-      texto.foreach(x => bw.write(x + "\n"))
+      texto.foreach(x => { bw.write(x + "\n"); println("-" + x) })
       bw.close()
     }
     //val bw = new BufferedWriter(new FileWriter(nombreArchivo))

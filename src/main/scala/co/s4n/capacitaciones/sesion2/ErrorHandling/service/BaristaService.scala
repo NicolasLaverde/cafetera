@@ -25,37 +25,48 @@ case class BaristaService(tiempoEspera: Int) {
       case CafeMolido(_, _) => None
     }
 
-  def prepararIngredientes(ingredientes: List[Ingrediente]): (Agua, CafeGrano) = {
+  def prepararIngredientes(ingredientes: List[Ingrediente]): (Option[Agua], Option[CafeGrano]) = {
 
     val optionList: List[Option[Ingrediente]] = ingredientes map (i => editarIngrediente(i))
     val list = optionList.filter(_.isDefined).map(x => x.get)
 
     list match {
-      case Nil => (Agua(1, 1), CafeGrano("", 1)) //TODO validar si hay una mejor forma de controlarlo
+      case Nil => (None, None)
       case x :: xs =>
         (list.head, list(1)) match {
           case (Agua(temperatura, cantLitros), CafeGrano(origen, cantidad)) =>
-            (Agua(temperatura, cantLitros), CafeGrano(origen, cantidad))
-          case _ => (Agua(1, 1), CafeGrano("", 1)) //TODO validar si hay una mejor forma de controlarlo
+            (Option(Agua(temperatura, cantLitros)), Option(CafeGrano(origen, cantidad)))
+          case _ => (None, None)
         }
     }
 
   }
 
-  def moler(granos: CafeGrano): CafeMolido = {
+  def moler(granos: Option[CafeGrano]): Option[CafeMolido] = {
     random()
-    CafeMolido(Random.nextInt(granos.cantidad.toInt + 1), granos)
+    granos match {
+      case Some(g) => Option(CafeMolido(Random.nextInt(g.cantidad.toInt + 1), g))
+      case None => None
+    }
+
   }
 
-  def calentar(agua: Agua): Agua = {
+  def calentar(agua: Option[Agua]): Option[Agua] = {
+    agua match {
+      case Some(a) => calienta(a)
+      case None => None
+    }
+  }
+
+  private def calienta(agua: Agua): Option[Agua] = {
     val temperatura: Int = Random.nextInt(100)
     verificarTemperatura(temperatura) match {
       case Right(_) => {
-        Agua(agua.temperatura + temperatura, agua.cantLitros / (temperatura / agua.temperatura))
+        Option(Agua(agua.temperatura + temperatura, agua.cantLitros / (temperatura / agua.temperatura)))
 
       }
       case Left(_) =>
-        calentar(agua)
+        calienta(agua)
     }
   }
 
@@ -65,7 +76,14 @@ case class BaristaService(tiempoEspera: Int) {
     } else Left("La temperatura no está bien")
   }
 
-  def preparar(cafe: CafeMolido, aguaCaliente: Agua): Cafe = {
-    Cafe(List(cafe, aguaCaliente))
+  def preparar(cafe: Option[CafeMolido], aguaCaliente: Option[Agua]): Option[Cafe] = {
+    cafe match {
+      case Some(c) => aguaCaliente match {
+        case Some(a) => Option(Cafe(List(c, a)))
+        case None => None
+      }
+      case None => None
+    }
+
   }
 }
