@@ -11,7 +11,7 @@ case class BaristaService(tiempoEspera: Int) {
 
   def random(): Unit = Thread.sleep(Random.nextInt(tiempoEspera))
 
-  def editarIngrediente[A <: Ingrediente](ing: A): Ingrediente =
+  def editarIngrediente[A <: Ingrediente](ing: A): Option[Ingrediente] =
     ing match {
 
       case CafeGrano(origen, cantidad) =>
@@ -20,21 +20,26 @@ case class BaristaService(tiempoEspera: Int) {
       case Agua(temperatura, cantLitros) =>
         AguaService().editar(Agua(temperatura, cantLitros))
 
-      case Leche(temperatura, cantLitros, tipoLeche) => Leche(temperatura, cantLitros, tipoLeche)
+      case Leche(_, _, _) => None
 
-      case CafeMolido(cantidad, cafeGrano) => CafeMolido(cantidad, cafeGrano)
+      case CafeMolido(_, _) => None
     }
 
-  def prepararIngredientesCafe(ingredientes: List[Ingrediente]): (Agua, CafeGrano) = {
+  def prepararIngredientes(ingredientes: List[Ingrediente]): (Agua, CafeGrano) = {
 
-    val list: List[Ingrediente] = ingredientes map (i => editarIngrediente(i))
-    if (list.size == 2) {
-      (list.head, list(1)) match {
-        case (Agua(temperatura, cantLitros), CafeGrano(origen, cantidad)) =>
-          (Agua(temperatura, cantLitros), CafeGrano(origen, cantidad))
-        case _ => (Agua(0, 0), CafeGrano("", 0))
-      }
-    } else (Agua(0, 0), CafeGrano("", 0))
+    val optionList: List[Option[Ingrediente]] = ingredientes map (i => editarIngrediente(i))
+    val list = optionList.filter(_.isDefined).map(x => x.get)
+
+    list match {
+      case Nil => (Agua(1, 1), CafeGrano("", 1)) //TODO validar si hay una mejor forma de controlarlo
+      case x :: xs =>
+        (list.head, list(1)) match {
+          case (Agua(temperatura, cantLitros), CafeGrano(origen, cantidad)) =>
+            (Agua(temperatura, cantLitros), CafeGrano(origen, cantidad))
+          case _ => (Agua(1, 1), CafeGrano("", 1)) //TODO validar si hay una mejor forma de controlarlo
+        }
+    }
+
   }
 
   def moler(granos: CafeGrano): CafeMolido = {
@@ -49,15 +54,15 @@ case class BaristaService(tiempoEspera: Int) {
         Agua(agua.temperatura + temperatura, agua.cantLitros / (temperatura / agua.temperatura))
 
       }
-      case Left(s) =>
-        println(s)
+      case Left(_) =>
         calentar(agua)
     }
   }
 
   def verificarTemperatura(temperatura: Double): Either[String, Double] = {
-    if (temperatura >= 50d && temperatura < 80d) Right(temperatura)
-    else Left("La temperatura no está bien")
+    if (temperatura >= 50d && temperatura < 80d) {
+      Right(temperatura)
+    } else Left("La temperatura no está bien")
   }
 
   def preparar(cafe: CafeMolido, aguaCaliente: Agua): Cafe = {

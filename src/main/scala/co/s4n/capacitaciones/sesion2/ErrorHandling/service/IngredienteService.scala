@@ -4,9 +4,9 @@ import co.s4n.capacitaciones.sesion2.ErrorHandling.Ingrediente
 
 trait IngredienteService[A <: Ingrediente] {
 
-  def editar(ingrediente: A): A
+  def editar(ingrediente: A): Option[A]
 
-  def editarUnIngrediente(ingrediente: A)(): A
+  def editarUnIngrediente(ingrediente: A)(): Option[A]
 
   def crearIngrediente(a: String, b: String): A
 
@@ -14,7 +14,7 @@ trait IngredienteService[A <: Ingrediente] {
 
   def seEdita(a: A, b: A): A
 
-  def escribirArchivoIngrediente(titulo: String, ingrediente: A, lista: List[A]): A
+  def escribirArchivoIngrediente(titulo: String, ingrediente: A, lista: List[A]): Option[A]
 
   def archivoLectura(ingrediente: A): String
 
