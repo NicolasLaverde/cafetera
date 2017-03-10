@@ -1,14 +1,10 @@
-import spray.revolver.RevolverPlugin._
-
-seq(Revolver.settings: _*)
-
-releaseSettings
+// build.sbt
 
 scalariformSettings
 
 organization := "co.s4n"
 
-name := "cafetera"
+name := "scala-base-project"
 
 scalaVersion := "2.12.1"
 
@@ -17,11 +13,13 @@ resolvers ++= Seq(
 )
 
 libraryDependencies ++= Seq(
-  "com.typesafe.scala-logging" %% "scala-logging" % "3.5.0" withSources() withJavadoc(),
-  "com.iheart" %% "ficus" % "1.4.0",
-  "ch.qos.logback" % "logback-classic" % "1.1.7",
-  "org.scalatest" % "scalatest_2.11" % "3.0.0" % "test"
+  "com.typesafe.scala-logging"  %%  "scala-logging"             % "3.5.0"     withSources() withJavadoc(),
+  "com.iheart"                  %%  "ficus"                     % "1.4.0",
+  "ch.qos.logback"              %   "logback-classic"           % "1.1.7",
+  "org.scalatest"               %   "scalatest_2.12"            % "3.0.0"     % "test"
 )
+
+coverageEnabled := false
 
 scalacOptions ++= Seq(
   "-deprecation",
@@ -48,7 +46,7 @@ publishArtifact in Test := false
 publishTo := {
   val nexus = "http://somewhere/nexus/"
   if (version.value.trim.endsWith("SNAPSHOT"))
-    Some("Nexus Snapshots" at nexus + "content/repositories/snapshots/")    
+    Some("Nexus Snapshots" at nexus + "content/repositories/snapshots/")
   else
     Some("Nexus Releases" at nexus + "content/repositories/releases")
 }
