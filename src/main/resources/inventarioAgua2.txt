@@ -1,3 +1,0 @@
-temperatura,cantidadLitros
-15,70.0
-15,65.0

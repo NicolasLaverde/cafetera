@@ -11,20 +11,6 @@ case class BaristaService(tiempoEspera: Int) {
 
   def random(): Unit = Thread.sleep(Random.nextInt(tiempoEspera))
 
-  def editarIngrediente[A <: Ingrediente](ing: A): Option[Ingrediente] =
-    ing match {
-
-      case CafeGrano(origen, cantidad) =>
-        CafeGranoService().editar(CafeGrano(origen, cantidad))
-
-      case Agua(temperatura, cantLitros) =>
-        AguaService().editar(Agua(temperatura, cantLitros))
-
-      case Leche(_, _, _) => None
-
-      case CafeMolido(_, _) => None
-    }
-
   def prepararIngredientes(ingredientes: List[Ingrediente]): (Option[Agua], Option[CafeGrano]) = {
 
     val optionList: List[Option[Ingrediente]] = ingredientes map (i => editarIngrediente(i))
@@ -39,8 +25,21 @@ case class BaristaService(tiempoEspera: Int) {
           case _ => (None, None)
         }
     }
-
   }
+
+  def editarIngrediente[A <: Ingrediente](ing: A): Option[Ingrediente] =
+    ing match {
+
+      case CafeGrano(origen, cantidad) =>
+        CafeGranoService().editar(CafeGrano(origen, cantidad))
+
+      case Agua(temperatura, cantLitros) =>
+        AguaService().editar(Agua(temperatura, cantLitros))
+
+      case Leche(_, _, _) => None
+
+      case CafeMolido(_, _) => None
+    }
 
   def moler(granos: Option[CafeGrano]): Option[CafeMolido] = {
     random()
@@ -48,7 +47,6 @@ case class BaristaService(tiempoEspera: Int) {
       case Some(g) => Option(CafeMolido(Random.nextInt(g.cantidad.toInt + 1), g))
       case None => None
     }
-
   }
 
   def calentar(agua: Option[Agua]): Option[Agua] = {

@@ -14,23 +14,6 @@ case class CafeGranoService() extends IngredienteService[CafeGrano] {
     editarUnIngrediente(ingrediente)
   }
 
-  def editarUnIngrediente(ingrediente: CafeGrano)(): Option[CafeGrano] = {
-
-    GestorArchivo().leerArchivo(archivoLectura(ingrediente)) match {
-      case Success((titulo, datos)) =>
-        val (filtro: List[CafeGrano], noFiltro: List[CafeGrano]) =
-          filtrarIngrediente(ingrediente, datos.map(x => crearIngrediente(x.head, x(1))))
-        escribirArchivoIngrediente(titulo, seEdita(ingrediente, filtro.head), noFiltro)
-      case Failure(f) => None
-    }
-
-    //val (titulo: String, datos: List[Array[String]]) = GestorArchivo().leerArchivo(archivoLectura(ingrediente))
-    //val ingredienteList: List[CafeGrano] = datos.map(x => crearIngrediente(x.head, x(1)))
-    //val (filtro: List[CafeGrano], noFiltro: List[CafeGrano]) = filtrarIngrediente(ingrediente, ingredienteList)
-
-    //escribirArchivoIngrediente(titulo, seEdita(ingrediente, filtro.head), noFiltro)
-  }
-
   def crearIngrediente(a: String, b: String): CafeGrano = {
     CafeGrano(a, b.toInt)
   }
