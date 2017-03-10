@@ -1,3 +1,7 @@
+resolvers += Resolver.url("scoverage-bintray", url("https://dl.bintray.com/sksamuel/sbt-plugins/"))(Resolver.ivyStylePatterns)
+
+addSbtPlugin("org.scoverage" % "sbt-scoverage" % "1.5.0")
+
 addSbtPlugin("com.typesafe.sbteclipse" % "sbteclipse-plugin" % "3.0.0")
 
 addSbtPlugin("io.spray" % "sbt-revolver" % "0.7.2")
