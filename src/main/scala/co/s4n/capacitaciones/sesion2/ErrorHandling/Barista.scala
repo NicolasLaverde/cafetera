@@ -3,7 +3,8 @@ package co.s4n.capacitaciones.sesion2.ErrorHandling
 import co.s4n.capacitaciones.sesion2.ErrorHandling.service.{ AguaService, CafeGranoService }
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
+import scala.concurrent.duration.Duration
+import scala.concurrent.{ Await, Future }
 import scala.util.{ Failure, Random, Success }
 
 case class Barista(tiempoEspera: Int) {
@@ -35,16 +36,15 @@ case class Barista(tiempoEspera: Int) {
     } else (Agua(0, 0), CafeGrano("", 0))
   }
 
-  def moler(granos: CafeGrano): Future[CafeMolido] = Future {
+  def moler(granos: CafeGrano): Option[CafeMolido] = {
     random()
-    CafeMolido(Random.nextInt(granos.cantidad.toInt + 1), granos)
+    Option(CafeMolido(Random.nextInt(granos.cantidad.toInt + 1), granos))
   }
 
-  def calentar(agua: Agua): Future[Option[Agua]] = {
-    random()
-    val temperatura: Int = Random.nextInt(30)
+  def calentar(agua: Agua): Option[Agua] = {
+    val temperatura: Int = Random.nextInt(100)
     verificarTemperatura(temperatura) match {
-      case Right(_) => Future {
+      case Right(_) => {
         val agua2 = Agua(agua.temperatura + temperatura, agua.cantLitros / (temperatura / agua.temperatura))
         Option(agua2)
       }
@@ -60,30 +60,38 @@ case class Barista(tiempoEspera: Int) {
     else Left("La temperatura no está bien")
   }
 
-  def preparar(cafe: CafeMolido, aguaCaliente: Agua): Future[Cafe] = Future {
-    random()
+  def preparar(cafe: CafeMolido, aguaCaliente: Agua): Cafe = {
     Cafe(List(cafe, aguaCaliente))
   }
+
 }
 
 object Barista {
   def prepararCafe(barista: Barista): Future[Cafe] = {
-
-    for {
+    (for {
       (agua, granos) <- Future(barista.prepararIngredientesCafe(List(Agua(15, 5), CafeGrano("Manizales", 12))))
-      cafeMolido <- barista.moler(granos)
-      aguaCaliente <- barista.calentar(agua)
-      cafePreparado: Cafe <- barista.preparar(cafeMolido, aguaCaliente.get)
-    } yield cafePreparado
+      cafeMolido <- Future(barista.moler(granos))
+      aguaCaliente <- Future(barista.calentar(agua))
+    } yield {
+      for {
+        xxx <- cafeMolido
+        yyy <- aguaCaliente
+      } yield barista.preparar(xxx, yyy)
+    }).flatMap {
+      case Some(cafe) => Future.successful(cafe)
+      case None => Future.failed(new Exception("Error"))
+    }
   }
 
   def main(args: Array[String]): Unit = {
     println("Empezando con el barista...")
     val barista: Barista = Barista(150)
-    Barista.prepararCafe(barista) onComplete {
-      case Success(_) => println("Termino de forma exitosa ")
-      case Failure(_) => println("Termino con error....... ")
-    }
+    val await = Await.result(Barista.prepararCafe(barista), Duration.Inf)
+    println(await)
+    //    Barista.prepararCafe(barista) onComplete {
+    //      case Success(cafe) => println("Termino de forma exitosa ")
+    //      case Failure(error) => println("Termino con error....... ")
+    //    }
 
   }
 
