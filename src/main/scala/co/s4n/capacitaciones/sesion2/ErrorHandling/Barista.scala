@@ -36,17 +36,17 @@ case class Barista(tiempoEspera: Int) {
     } else (Agua(0, 0), CafeGrano("", 0))
   }
 
-  def moler(granos: CafeGrano): Option[CafeMolido] = {
+  def moler(granos: CafeGrano): CafeMolido = {
     random()
-    Option(CafeMolido(Random.nextInt(granos.cantidad.toInt + 1), granos))
+    CafeMolido(Random.nextInt(granos.cantidad.toInt + 1), granos)
   }
 
-  def calentar(agua: Agua): Option[Agua] = {
+  def calentar(agua: Agua): Agua = {
     val temperatura: Int = Random.nextInt(100)
     verificarTemperatura(temperatura) match {
       case Right(_) => {
-        val agua2 = Agua(agua.temperatura + temperatura, agua.cantLitros / (temperatura / agua.temperatura))
-        Option(agua2)
+        Agua(agua.temperatura + temperatura, agua.cantLitros / (temperatura / agua.temperatura))
+
       }
 
       case Left(_) =>
@@ -68,19 +68,12 @@ case class Barista(tiempoEspera: Int) {
 
 object Barista {
   def prepararCafe(barista: Barista): Future[Cafe] = {
-    (for {
+    for {
       (agua, granos) <- Future(barista.prepararIngredientesCafe(List(Agua(15, 5), CafeGrano("Manizales", 12))))
       cafeMolido <- Future(barista.moler(granos))
       aguaCaliente <- Future(barista.calentar(agua))
-    } yield {
-      for {
-        cafe <- cafeMolido
-        agua <- aguaCaliente
-      } yield barista.preparar(cafe, agua)
-    }).flatMap {
-      case Some(cafe) => Future.successful(cafe)
-      case None => Future.failed(new Exception("Error"))
-    }
+      cafe <- Future(barista.preparar(cafeMolido, aguaCaliente))
+    } yield cafe
   }
 
   def main(args: Array[String]): Unit = {
