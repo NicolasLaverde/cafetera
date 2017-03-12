@@ -4,37 +4,34 @@ import co.s4n.capacitaciones.sesion2.ErrorHandling._
 
 import scala.util.Random
 
-/**
- * Created by daniel on 9/03/17.
- */
 case class BaristaService(tiempoEspera: Int) {
 
   def random(): Unit = Thread.sleep(Random.nextInt(tiempoEspera))
 
   def prepararIngredientes(ingredientes: List[Ingrediente]): (Option[Agua], Option[CafeGrano]) = {
 
-    val optionList: List[Option[Ingrediente]] = ingredientes map (i => editarIngrediente(i))
+    val optionList: List[Option[Ingrediente]] = ingredientes map (i => revisarInventario(i))
     val list = optionList.filter(_.isDefined).map(x => x.get)
 
     list match {
-      case Nil => (None, None)
-      case x :: xs =>
+      case _ :: _ =>
         (list.head, list(1)) match {
           case (Agua(temperatura, cantLitros), CafeGrano(origen, cantidad)) =>
             (Option(Agua(temperatura, cantLitros)), Option(CafeGrano(origen, cantidad)))
           case _ => (None, None)
         }
+      case _ => (None, None)
     }
   }
 
-  def editarIngrediente[A <: Ingrediente](ing: A): Option[Ingrediente] =
+  def revisarInventario[A <: Ingrediente](ing: A): Option[Ingrediente] =
     ing match {
 
       case CafeGrano(origen, cantidad) =>
-        CafeGranoService().editar(CafeGrano(origen, cantidad))
+        CafeGranoService.prepararIngrediente(CafeGrano(origen, cantidad))
 
       case Agua(temperatura, cantLitros) =>
-        AguaService().editar(Agua(temperatura, cantLitros))
+        AguaService.prepararIngrediente(Agua(temperatura, cantLitros))
 
       case Leche(_, _, _) => None
 
@@ -59,10 +56,8 @@ case class BaristaService(tiempoEspera: Int) {
   private def calienta(agua: Agua): Option[Agua] = {
     val temperatura: Int = Random.nextInt(100)
     verificarTemperatura(temperatura) match {
-      case Right(_) => {
+      case Right(_) =>
         Option(Agua(agua.temperatura + temperatura, agua.cantLitros / (temperatura / agua.temperatura)))
-
-      }
       case Left(_) =>
         calienta(agua)
     }

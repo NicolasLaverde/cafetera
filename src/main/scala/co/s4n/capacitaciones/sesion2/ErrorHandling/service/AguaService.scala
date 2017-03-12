@@ -1,24 +1,35 @@
 package co.s4n.capacitaciones.sesion2.ErrorHandling.service
 
-import co.s4n.capacitaciones.sesion2.ErrorHandling.{ Agua, CafeGrano }
-import co.s4n.capacitaciones.sesion2.ErrorHandling.repository.GestorArchivo
+import co.s4n.capacitaciones.sesion2.ErrorHandling.Agua
+import co.s4n.capacitaciones.sesion2.ErrorHandling.repository.GestorInventario
 
 import scala.util.{ Failure, Success }
 
-case class AguaService() extends IngredienteService[Agua] {
+case object AguaService extends IngredienteService[Agua] {
 
   private val archivoAgua: String = "/inventarioAgua.txt"
   private val archivoSalidaAgua: String = "./src/main/resources/inventarioAgua2.txt"
 
-  def editar(ingrediente: Agua): Option[Agua] = {
-    editarUnIngrediente(ingrediente)
+  def prepararIngrediente(ingrediente: Agua): Option[Agua] = {
+    GestorInventario.leerInventario(obtenerArchivoLectura(ingrediente)) match {
+      case Success((titulo, datos)) =>
+        val agua: List[Agua] = agruparInventario(datos.map(x => crearIngrediente(x.head, x(1))))
+        val (filtro: List[Agua], noFiltro: List[Agua]) = validarInventario(ingrediente, agua)
+        val editado: Agua = seEdita(ingrediente, filtro.head)
+        actualizarInventarioIngrediente(titulo, editado, noFiltro)
+      case Failure(_) => None
+    }
+  }
+
+  def agruparInventario(lista: List[Agua]): List[Agua] = {
+    List(Agua(lista.head.temperatura, lista.map(x => x.cantLitros).sum))
   }
 
   def crearIngrediente(a: String, b: String): Agua = {
     Agua(a.toInt, b.toDouble)
   }
 
-  def filtrarIngrediente(ingrediente: Agua, lista: List[Agua]): (List[Agua], List[Agua]) = {
+  def validarInventario(ingrediente: Agua, lista: List[Agua]): (List[Agua], List[Agua]) = {
     val list: List[Agua] = List(Agua(ingrediente.temperatura, lista.map(x => x.cantLitros).sum - ingrediente.cantLitros))
     (list, list)
   }
@@ -27,22 +38,21 @@ case class AguaService() extends IngredienteService[Agua] {
     if (b.cantLitros - a.cantLitros >= 0)
       Agua(a.temperatura, b.cantLitros - a.cantLitros)
     else
-      a
+      b
   }
 
-  def escribirArchivoIngrediente(titulo: String, ingrediente: Agua, lista: List[Agua]): Option[Agua] = {
-    GestorArchivo().escribir(titulo :: /*lista.map(x => x.toString) ++*/ List(ingrediente.toString), archivoEscritura(ingrediente)) match {
-      case Success(s) => Option(ingrediente)
-      case Failure(f) => None
+  def actualizarInventarioIngrediente(titulo: String, ingrediente: Agua, lista: List[Agua]): Option[Agua] = {
+    GestorInventario.escribirInventario(titulo :: List(ingrediente.toString()), obtenerArchivoEscritura(ingrediente)) match {
+      case Success(_) => Option(ingrediente)
+      case Failure(_) => None
     }
   }
 
-  def archivoLectura(ingrediente: Agua): String = {
+  def obtenerArchivoLectura(ingrediente: Agua): String = {
     archivoAgua
   }
 
-  def archivoEscritura(ingrediente: Agua): String = {
+  def obtenerArchivoEscritura(ingrediente: Agua): String = {
     archivoSalidaAgua
   }
-
 }

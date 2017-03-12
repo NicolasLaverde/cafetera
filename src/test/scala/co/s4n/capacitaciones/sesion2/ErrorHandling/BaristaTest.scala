@@ -5,7 +5,6 @@ import org.scalatest.FunSuite
 
 import scala.concurrent.Await
 import scala.concurrent.duration.Duration
-import scala.concurrent.ExecutionContext.Implicits.global
 
 /**
  * Created by daniel on 10/03/17.

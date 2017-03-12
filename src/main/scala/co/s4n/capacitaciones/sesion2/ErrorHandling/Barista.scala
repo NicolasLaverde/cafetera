@@ -9,7 +9,7 @@ import scala.concurrent.{ Await, Future }
 object Barista {
   def prepararCafe(barista: BaristaService): Future[Cafe] = {
     for {
-      (agua, granos) <- Future(barista.prepararIngredientes(List(Agua(15, 5), CafeGrano("Manizales", 12))))
+      (agua, granos) <- Future(barista.prepararIngredientes(List(Agua(15, 5), CafeGrano("Manizales", 21))))
       cafeMolido <- Future(barista.moler(granos))
       aguaCaliente <- Future(barista.calentar(agua))
     } yield barista.preparar(cafeMolido, aguaCaliente)

@@ -1,9 +1,5 @@
 package co.s4n.capacitaciones.sesion2.ErrorHandling
 
-import java.io.{ BufferedWriter, FileWriter, InputStream }
-
-import co.s4n.capacitaciones.sesion2.ErrorHandling.repository.GestorArchivo
-
 sealed trait Ingrediente
 case class Agua(temperatura: Int, cantLitros: Double) extends Ingrediente {
   override def toString(): String = { temperatura + "," + cantLitros }
