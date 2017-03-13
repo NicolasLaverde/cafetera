@@ -10,35 +10,31 @@ case object AguaService extends IngredienteService[Agua] {
   private val archivoAgua: String = "/inventarioAgua.txt"
   private val archivoSalidaAgua: String = "./src/main/resources/inventarioAgua2.txt"
 
-  def prepararIngrediente(ingrediente: Agua): Option[Agua] = {
-    GestorInventario.leerInventario(obtenerArchivoLectura(ingrediente)) match {
-      case Success((titulo, datos)) =>
-        val agua: List[Agua] = agruparInventario(datos.map(x => crearIngrediente(x.head, x(1))))
-        val (filtro: List[Agua], noFiltro: List[Agua]) = validarInventario(ingrediente, agua)
-        val editado: Agua = seEdita(ingrediente, filtro.head)
-        actualizarInventarioIngrediente(titulo, editado, noFiltro)
-      case Failure(_) => None
+  def agruparInventario(lista: List[Array[String]]): Option[List[Agua]] = {
+    if (lista.isEmpty) None
+    else {
+      val aguas = lista.map(x => crearIngrediente(x.head, x(1)))
+      Option(List(Agua(aguas.head.temperatura, aguas.map(x => x.cantLitros).sum)))
     }
-  }
-
-  def agruparInventario(lista: List[Agua]): List[Agua] = {
-    List(Agua(lista.head.temperatura, lista.map(x => x.cantLitros).sum))
   }
 
   def crearIngrediente(a: String, b: String): Agua = {
     Agua(a.toInt, b.toDouble)
   }
 
-  def validarInventario(ingrediente: Agua, lista: List[Agua]): (List[Agua], List[Agua]) = {
-    val list: List[Agua] = List(Agua(ingrediente.temperatura, lista.map(x => x.cantLitros).sum - ingrediente.cantLitros))
-    (list, list)
+  def validarInventario(ingrediente: Agua, lista: List[Agua]): Option[(List[Agua], List[Agua])] = {
+    if (lista.isEmpty) None
+    else {
+      val list: List[Agua] = List(Agua(ingrediente.temperatura, lista.map(x => x.cantLitros).sum - ingrediente.cantLitros))
+      Option((list, list))
+    }
   }
 
-  def seEdita(a: Agua, b: Agua): Agua = {
+  def seEdita(a: Agua, b: Agua): Option[Agua] = {
     if (b.cantLitros - a.cantLitros >= 0)
-      Agua(a.temperatura, b.cantLitros - a.cantLitros)
+      Option(Agua(a.temperatura, b.cantLitros - a.cantLitros))
     else
-      b
+      None
   }
 
   def actualizarInventarioIngrediente(titulo: String, ingrediente: Agua, lista: List[Agua]): Option[Agua] = {

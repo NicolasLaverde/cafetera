@@ -15,7 +15,7 @@ object Barista {
     } yield barista.preparar(cafeMolido, aguaCaliente)
   }.flatMap {
     case Some(cafe) => Future.successful(cafe)
-    case None => Future.failed(new Exception("Error haciendo café"))
+    case None => Future.failed(new Exception("No se pudo hacer bien el café..."))
   }
 
   def main(args: Array[String]): Unit = {

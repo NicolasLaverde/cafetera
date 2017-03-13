@@ -1,3 +1,0 @@
-origen,cantidadGramos
-Medellin,50.0
-Manizales,20.0

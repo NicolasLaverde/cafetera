@@ -14,13 +14,14 @@ case class BaristaService(tiempoEspera: Int) {
     val list = optionList.filter(_.isDefined).map(x => x.get)
 
     list match {
+      case Nil => (None, None)
+      case _ :: Nil => (None, None)
       case _ :: _ =>
         (list.head, list(1)) match {
           case (Agua(temperatura, cantLitros), CafeGrano(origen, cantidad)) =>
             (Option(Agua(temperatura, cantLitros)), Option(CafeGrano(origen, cantidad)))
           case _ => (None, None)
         }
-      case _ => (None, None)
     }
   }
 
